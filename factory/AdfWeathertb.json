@@ -1,0 +1,9 @@
+{
+	"name": "AdfWeathertb",
+	"location": "northeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "5383b151-3152-4755-8ee5-e863b7f76a56",
+		"tenantId": "154e146d-38b7-469a-87cb-6059eb1d9720"
+	}
+}

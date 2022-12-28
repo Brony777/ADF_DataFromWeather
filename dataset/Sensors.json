@@ -1,0 +1,20 @@
+{
+	"name": "Sensors",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "LocalDB"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Sensors"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

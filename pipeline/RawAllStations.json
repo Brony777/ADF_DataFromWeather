@@ -1,0 +1,161 @@
+{
+	"name": "RawAllStations",
+	"properties": {
+		"activities": [
+			{
+				"name": "AllStations",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "SqlServerSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": true,
+						"tableOption": "autoCreate"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['id']"
+								},
+								"sink": {
+									"name": "id",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "$['stationName']"
+								},
+								"sink": {
+									"name": "stationName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['gegrLat']"
+								},
+								"sink": {
+									"name": "gegrLat",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['gegrLon']"
+								},
+								"sink": {
+									"name": "gegrLon",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['city']['id']"
+								},
+								"sink": {
+									"name": "Cityid",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "$['city']['name']"
+								},
+								"sink": {
+									"name": "Cityname",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['city']['commune']['communeName']"
+								},
+								"sink": {
+									"name": "communeName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['city']['commune']['districtName']"
+								},
+								"sink": {
+									"name": "districtName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['city']['commune']['provinceName']"
+								},
+								"sink": {
+									"name": "provinceName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['addressStreet']"
+								},
+								"sink": {
+									"name": "addressStreet",
+									"type": "String"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AllStationFiles",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AllStations",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"variables": {
+			"ListOfFiles": {
+				"type": "Array"
+			},
+			"FilePath": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "2_FromBlogToStg"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-11-22T11:50:44Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

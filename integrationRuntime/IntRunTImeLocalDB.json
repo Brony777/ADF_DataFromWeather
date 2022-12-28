@@ -1,0 +1,6 @@
+{
+	"name": "IntRunTImeLocalDB",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}

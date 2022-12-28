@@ -1,0 +1,24 @@
+{
+	"name": "OnceDailyInNight",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "Ingest All stations",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-09-15T00:55:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

@@ -1,0 +1,63 @@
+{
+	"name": "AllStations",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "LocalDB"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "stationName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "gegrLat",
+				"type": "nvarchar"
+			},
+			{
+				"name": "gegrLon",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Cityid",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Cityname",
+				"type": "nvarchar"
+			},
+			{
+				"name": "communeName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "districtName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "provinceName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "addressStreet",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "AllStations"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

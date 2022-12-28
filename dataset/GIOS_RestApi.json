@@ -1,0 +1,28 @@
+{
+	"name": "GIOS_RestApi",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "GiosRestApi",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"RestApiRelative": {
+				"type": "string",
+				"defaultValue": "station/findAll"
+			}
+		},
+		"folder": {
+			"name": "RestApi"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().RestApiRelative",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
