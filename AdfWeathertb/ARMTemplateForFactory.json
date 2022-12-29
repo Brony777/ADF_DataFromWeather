@@ -1109,7 +1109,12 @@
 							"dataset": {
 								"referenceName": "AllFiles",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"FolderName": {
+										"value": "''",
+										"type": "Expression"
+									}
+								}
 							},
 							"fieldList": [
 								"childItems"
@@ -1121,6 +1126,62 @@
 							"formatSettings": {
 								"type": "JsonReadSettings"
 							}
+						}
+					},
+					{
+						"name": "For each folder",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get List of all folders",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get List of all folders').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Get Metadata1",
+									"type": "GetMetadata",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "AllFiles",
+											"type": "DatasetReference",
+											"parameters": {
+												"FolderName": {
+													"value": "@item()",
+													"type": "Expression"
+												}
+											}
+										},
+										"fieldList": [
+											"childItems"
+										],
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"enablePartitionDiscovery": false
+										},
+										"formatSettings": {
+											"type": "JsonReadSettings"
+										}
+									}
+								}
+							]
 						}
 					}
 				],
@@ -1145,6 +1206,11 @@
 				"linkedServiceName": {
 					"referenceName": "stagerawdata",
 					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FolderName": {
+						"type": "string"
+					}
 				},
 				"folder": {
 					"name": "ADLS_FlatFiles"
