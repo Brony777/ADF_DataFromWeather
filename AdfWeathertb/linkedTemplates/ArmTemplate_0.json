@@ -204,6 +204,10 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().FolderName",
+							"type": "Expression"
+						},
 						"fileSystem": "stagerawdata"
 					}
 				},
