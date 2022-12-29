@@ -1,9 +1,12 @@
 {
-	"name": "Json1",
+	"name": "AllFiles",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "stagerawdata",
 			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ADLS_FlatFiles"
 		},
 		"annotations": [],
 		"type": "Json",

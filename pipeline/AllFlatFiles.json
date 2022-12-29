@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "Json1",
+						"referenceName": "AllFiles",
 						"type": "DatasetReference"
 					},
 					"fieldList": [
