@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "AllFiles",
+						"referenceName": "Container",
 						"type": "DatasetReference"
 					},
 					"fieldList": [
