@@ -17,13 +17,7 @@
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "AllFiles",
-						"type": "DatasetReference",
-						"parameters": {
-							"FolderName": {
-								"value": "''",
-								"type": "Expression"
-							}
-						}
+						"type": "DatasetReference"
 					},
 					"fieldList": [
 						"childItems"
