@@ -1150,7 +1150,14 @@
 								{
 									"name": "Get Metadata1",
 									"type": "GetMetadata",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Set FolderName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -1165,7 +1172,7 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"FolderName": {
-													"value": "@item()",
+													"value": "@variables('FolderName')",
 													"type": "Expression"
 												}
 											}
@@ -1181,6 +1188,19 @@
 											"type": "JsonReadSettings"
 										}
 									}
+								},
+								{
+									"name": "Set FolderName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "FolderName",
+										"value": {
+											"value": "@item().item",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -1189,6 +1209,12 @@
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
+				},
+				"variables": {
+					"FolderName": {
+						"type": "String",
+						"defaultValue": "''"
+					}
 				},
 				"folder": {
 					"name": "BlobStorage"
