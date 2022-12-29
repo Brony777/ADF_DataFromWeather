@@ -77,7 +77,7 @@
 									"path": "$['city']['id']"
 								},
 								"sink": {
-									"name": "Cityid",
+									"name": "id",
 									"type": "Int32"
 								}
 							},
