@@ -11,7 +11,7 @@
 					"referenceName": "azk",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "tobedev"
+				"secretName": "StorageKey"
 			}
 		}
 	},
