@@ -69,14 +69,9 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataset": {
-								"referenceName": "AllFiles",
+								"referenceName": "Container",
 								"type": "DatasetReference",
-								"parameters": {
-									"FolderName": {
-										"value": "''",
-										"type": "Expression"
-									}
-								}
+								"parameters": {}
 							},
 							"fieldList": [
 								"childItems"
@@ -184,6 +179,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Container')]",
 				"[concat(variables('factoryId'), '/datasets/AllFiles')]"
 			]
 		},
@@ -1259,6 +1255,76 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Container')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "stagerawdata",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "ADLS_FlatFiles"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "stagerawdata"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "integer"
+						},
+						"stationName": {
+							"type": "string"
+						},
+						"gegrLat": {
+							"type": "string"
+						},
+						"gegrLon": {
+							"type": "string"
+						},
+						"city": {
+							"type": "object",
+							"properties": {
+								"id": {
+									"type": "integer"
+								},
+								"name": {
+									"type": "string"
+								},
+								"commune": {
+									"type": "object",
+									"properties": {
+										"communeName": {
+											"type": "string"
+										},
+										"districtName": {
+											"type": "string"
+										},
+										"provinceName": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						},
+						"addressStreet": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/stagerawdata')]"
+			]
 		}
 	]
 }
