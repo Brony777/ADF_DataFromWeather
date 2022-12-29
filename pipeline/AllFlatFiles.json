@@ -38,7 +38,7 @@
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "For each folder",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -50,6 +50,10 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
+					"items": {
+						"value": "@activity('Get List of all folders').output.childItems",
+						"type": "Expression"
+					},
 					"activities": [
 						{
 							"name": "Get Metadata1",
@@ -66,7 +70,13 @@
 							"typeProperties": {
 								"dataset": {
 									"referenceName": "AllFiles",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderName": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
 								},
 								"fieldList": [
 									"childItems"
