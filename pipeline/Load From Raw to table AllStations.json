@@ -1,5 +1,5 @@
 {
-	"name": "RawAllStations",
+	"name": "Load From Raw to table AllStations",
 	"properties": {
 		"activities": [
 			{
