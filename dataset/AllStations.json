@@ -2,7 +2,7 @@
 	"name": "AllStations",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SqlServer1",
+			"referenceName": "SandboxAzure",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
