@@ -11,13 +11,13 @@
 		"AzureDatabricks1_accessToken": {
 			"value": ""
 		},
+		"SandboxAzure_connectionString": {
+			"value": ""
+		},
 		"SqlServer1_connectionString": {
 			"value": ""
 		},
 		"stagerawdata_accountKey": {
-			"value": ""
-		},
-		"SandboxAzure_connectionString": {
 			"value": ""
 		},
 		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
@@ -26,14 +26,14 @@
 		"GiosRestApi_properties_typeProperties_url": {
 			"value": "https://api.gios.gov.pl/pjp-api/rest/"
 		},
+		"SandboxSQLAzure_properties_typeProperties_baseUrl": {
+			"value": "https://tobepasswords.vault.azure.net/"
+		},
 		"azk_properties_typeProperties_baseUrl": {
 			"value": "https://tobepasswords.vault.azure.net/"
 		},
 		"stagerawdata_properties_typeProperties_url": {
 			"value": "https://smweather.dfs.core.windows.net/"
-		},
-		"SandboxSQLAzure_properties_typeProperties_baseUrl": {
-			"value": "https://tobepasswords.vault.azure.net/"
 		}
 	}
 }

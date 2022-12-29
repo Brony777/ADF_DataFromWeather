@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'AzureDatabricks1'"
 		},
+		"SandboxAzure_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SandboxAzure'"
+		},
 		"SqlServer1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer1'"
@@ -22,10 +26,6 @@
 		"stagerawdata_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'stagerawdata'"
-		},
-		"SandboxAzure_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'SandboxAzure'"
 		},
 		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
 			"type": "string",
@@ -35,6 +35,10 @@
 			"type": "string",
 			"defaultValue": "https://api.gios.gov.pl/pjp-api/rest/"
 		},
+		"SandboxSQLAzure_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://tobepasswords.vault.azure.net/"
+		},
 		"azk_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://tobepasswords.vault.azure.net/"
@@ -42,10 +46,6 @@
 		"stagerawdata_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://smweather.dfs.core.windows.net/"
-		},
-		"SandboxSQLAzure_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://tobepasswords.vault.azure.net/"
 		}
 	},
 	"variables": {
@@ -122,54 +122,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LoadOnlyNewStations')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Python1",
-						"type": "DatabricksSparkPython",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pythonFile": "/Users/tobe@softwaremind.com/FromRestAPI",
-							"parameters": [],
-							"libraries": [
-								{
-									"jar": ""
-								}
-							]
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureDatabricks1",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "2_FromBlogToStg"
-				},
-				"annotations": [],
-				"lastPublishTime": "2022-11-24T15:22:45Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RawAllStations')]",
+			"name": "[concat(parameters('factoryName'), '/Load From Raw to table AllStations')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -338,6 +291,53 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/AllStationFiles')]",
 				"[concat(variables('factoryId'), '/datasets/AllStations')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LoadOnlyNewStations')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Python1",
+						"type": "DatabricksSparkPython",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pythonFile": "/Users/tobe@softwaremind.com/FromRestAPI",
+							"parameters": [],
+							"libraries": [
+								{
+									"jar": ""
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricks1",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "2_FromBlogToStg"
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-11-24T15:22:45Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
 			]
 		},
 		{
@@ -979,6 +979,32 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SandboxAzure')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SandboxAzure_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SandboxSQLAzure')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('SandboxSQLAzure_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SqlServer1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1064,32 +1090,6 @@
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SandboxSQLAzure')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('SandboxSQLAzure_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SandboxAzure')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "SqlServer",
-				"typeProperties": {
-					"connectionString": "[parameters('SandboxAzure_connectionString')]"
-				}
 			},
 			"dependsOn": []
 		}

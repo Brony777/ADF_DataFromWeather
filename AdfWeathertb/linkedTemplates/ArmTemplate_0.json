@@ -15,13 +15,13 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'AzureDatabricks1'"
 		},
-		"stagerawdata_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'stagerawdata'"
-		},
 		"SandboxAzure_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SandboxAzure'"
+		},
+		"stagerawdata_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'stagerawdata'"
 		},
 		"SqlServer1_connectionString": {
 			"type": "secureString",
@@ -35,6 +35,10 @@
 			"type": "string",
 			"defaultValue": "https://api.gios.gov.pl/pjp-api/rest/"
 		},
+		"SandboxSQLAzure_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://tobepasswords.vault.azure.net/"
+		},
 		"azk_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://tobepasswords.vault.azure.net/"
@@ -42,10 +46,6 @@
 		"stagerawdata_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://smweather.dfs.core.windows.net/"
-		},
-		"SandboxSQLAzure_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://tobepasswords.vault.azure.net/"
 		}
 	},
 	"variables": {
@@ -99,6 +99,32 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SandboxAzure')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SandboxAzure_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SandboxSQLAzure')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('SandboxSQLAzure_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/azk')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -135,32 +161,6 @@
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SandboxSQLAzure')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('SandboxSQLAzure_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SandboxAzure')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "SqlServer",
-				"typeProperties": {
-					"connectionString": "[parameters('SandboxAzure_connectionString')]"
-				}
 			},
 			"dependsOn": []
 		},
@@ -590,7 +590,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/RawAllStations')]",
+			"name": "[concat(parameters('factoryName'), '/Load From Raw to table AllStations')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
