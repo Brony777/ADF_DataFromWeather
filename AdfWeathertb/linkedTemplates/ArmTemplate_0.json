@@ -1111,7 +1111,7 @@
 								"itemName"
 							],
 							"storeSettings": {
-								"type": "AzureBlobStorageReadSettings",
+								"type": "AzureBlobFSReadSettings",
 								"enablePartitionDiscovery": false
 							},
 							"formatSettings": {
