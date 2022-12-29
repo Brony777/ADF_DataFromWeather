@@ -1,11 +1,6 @@
 {
 	"name": "AzureBlobStorage1",
 	"properties": {
-		"parameters": {
-			"folder_name": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"type": "AzureBlobStorage",
 		"typeProperties": {
