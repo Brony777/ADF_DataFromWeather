@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'stagerawdata'"
 		},
+		"SandboxAzure_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SandboxAzure'"
+		},
 		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
 			"type": "string",
 			"defaultValue": "1101-200746-l7lbyi4n"
@@ -38,6 +42,10 @@
 		"stagerawdata_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://smweather.dfs.core.windows.net/"
+		},
+		"SandboxSQLAzure_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://tobepasswords.vault.azure.net/"
 		}
 	},
 	"variables": {
@@ -241,7 +249,7 @@
 											"path": "$['city']['id']"
 										},
 										"sink": {
-											"name": "Cityid",
+											"name": "id",
 											"type": "Int32"
 										}
 									},
@@ -667,8 +675,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "Stations11:48:20.json",
-						"folderPath": "2022-11-22",
+						"fileName": "Stations00:55:02.json",
+						"folderPath": "2022-12-29",
 						"fileSystem": "stagerawdata"
 					}
 				},
@@ -728,7 +736,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SqlServer1",
+					"referenceName": "SandboxAzure",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -786,7 +794,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]"
+				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
 			]
 		},
 		{
@@ -1056,6 +1064,32 @@
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SandboxSQLAzure')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('SandboxSQLAzure_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SandboxAzure')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SandboxAzure_connectionString')]"
+				}
 			},
 			"dependsOn": []
 		}

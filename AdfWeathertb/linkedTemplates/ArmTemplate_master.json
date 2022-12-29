@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'stagerawdata'"
 		},
+		"SandboxAzure_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SandboxAzure'"
+		},
 		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
 			"type": "string",
 			"defaultValue": "1101-200746-l7lbyi4n"
@@ -38,6 +42,10 @@
 		"stagerawdata_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://smweather.dfs.core.windows.net/"
+		},
+		"SandboxSQLAzure_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://tobepasswords.vault.azure.net/"
 		},
 		"containerUri": {
 			"type": "string",
@@ -75,6 +83,9 @@
 					"stagerawdata_accountKey": {
 						"value": "[parameters('stagerawdata_accountKey')]"
 					},
+					"SandboxAzure_connectionString": {
+						"value": "[parameters('SandboxAzure_connectionString')]"
+					},
 					"SqlServer1_connectionString": {
 						"value": "[parameters('SqlServer1_connectionString')]"
 					},
@@ -89,6 +100,9 @@
 					},
 					"stagerawdata_properties_typeProperties_url": {
 						"value": "[parameters('stagerawdata_properties_typeProperties_url')]"
+					},
+					"SandboxSQLAzure_properties_typeProperties_baseUrl": {
+						"value": "[parameters('SandboxSQLAzure_properties_typeProperties_baseUrl')]"
 					}
 				}
 			},

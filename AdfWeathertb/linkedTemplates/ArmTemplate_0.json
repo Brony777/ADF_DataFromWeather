@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'stagerawdata'"
 		},
+		"SandboxAzure_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SandboxAzure'"
+		},
 		"SqlServer1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer1'"
@@ -38,6 +42,10 @@
 		"stagerawdata_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://smweather.dfs.core.windows.net/"
+		},
+		"SandboxSQLAzure_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://tobepasswords.vault.azure.net/"
 		}
 	},
 	"variables": {
@@ -127,6 +135,32 @@
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SandboxSQLAzure')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('SandboxSQLAzure_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SandboxAzure')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SandboxAzure_connectionString')]"
+				}
 			},
 			"dependsOn": []
 		},
@@ -234,8 +268,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "Stations11:48:20.json",
-						"folderPath": "2022-11-22",
+						"fileName": "Stations00:55:02.json",
+						"folderPath": "2022-12-29",
 						"fileSystem": "stagerawdata"
 					}
 				},
@@ -287,6 +321,73 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/stagerawdata')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AllStations')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SandboxAzure",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "LocalDB"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "stationName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "gegrLat",
+						"type": "nvarchar"
+					},
+					{
+						"name": "gegrLon",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Cityid",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Cityname",
+						"type": "nvarchar"
+					},
+					{
+						"name": "communeName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "districtName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "provinceName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "addressStreet",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "AllStations"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
 			]
 		},
 		{
@@ -489,97 +590,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AllStations')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SqlServer1",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "LocalDB"
-				},
-				"annotations": [],
-				"type": "SqlServerTable",
-				"schema": [
-					{
-						"name": "id",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "stationName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "gegrLat",
-						"type": "nvarchar"
-					},
-					{
-						"name": "gegrLon",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Cityid",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "Cityname",
-						"type": "nvarchar"
-					},
-					{
-						"name": "communeName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "districtName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "provinceName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "addressStreet",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "AllStations"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Sensors')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SqlServer1",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "LocalDB"
-				},
-				"annotations": [],
-				"type": "SqlServerTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Sensors"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/RawAllStations')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -660,7 +670,7 @@
 											"path": "$['city']['id']"
 										},
 										"sink": {
-											"name": "Cityid",
+											"name": "id",
 											"type": "Int32"
 										}
 									},
@@ -1027,6 +1037,30 @@
 				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]",
 				"[concat(variables('factoryId'), '/datasets/GIOS_RestApi')]",
 				"[concat(variables('factoryId'), '/datasets/AllSensors')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Sensors')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "LocalDB"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Sensors"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]"
 			]
 		},
 		{
