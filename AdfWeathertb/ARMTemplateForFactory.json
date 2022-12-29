@@ -175,8 +175,7 @@
 				},
 				"variables": {
 					"FolderName": {
-						"type": "String",
-						"defaultValue": "''"
+						"type": "String"
 					}
 				},
 				"folder": {
