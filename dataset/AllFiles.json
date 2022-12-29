@@ -5,6 +5,11 @@
 			"referenceName": "stagerawdata",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"FolderName": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "ADLS_FlatFiles"
 		},
