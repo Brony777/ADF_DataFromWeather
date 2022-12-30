@@ -24,7 +24,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"sqlReaderQuery": "select distinct\n\talst.id\nfrom\n\tdbo.AllStations as alst\n\tleft join dbo.MetaData_Station as mdst\n\ton alst.id = mdst.id\nwhere\n\tmdst.id is null",
+						"sqlReaderQuery": "select distinct\n\talst.id\nfrom\n\tdbo.AllStations as alst",
 						"queryTimeout": "02:00:00",
 						"isolationLevel": "ReadCommitted",
 						"partitionOption": "None"
