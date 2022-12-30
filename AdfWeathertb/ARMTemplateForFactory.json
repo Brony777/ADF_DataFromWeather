@@ -628,14 +628,7 @@
 					{
 						"name": "GetAvailableSensors",
 						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Clear metadata Station",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -647,7 +640,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlServerSource",
-								"sqlReaderQuery": "select distinct\n\talst.id\nfrom\n\tdbo.AllStations as alst\n\tleft join dbo.MetaData_Station as mdst\n\ton alst.id = mdst.id\nwhere\n\tmdst.id is null",
+								"sqlReaderQuery": "select distinct\n\talst.id\nfrom\n\tdbo.AllStations as alst",
 								"queryTimeout": "02:00:00",
 								"isolationLevel": "ReadCommitted",
 								"partitionOption": "None"
@@ -840,37 +833,11 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SqlServer1",
+										"referenceName": "SandboxAzure",
 										"type": "LinkedServiceReference"
 									}
 								}
 							]
-						}
-					},
-					{
-						"name": "Clear metadata Station",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SqlServer1",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "truncate table dbo.MetaData_Station"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -892,9 +859,9 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/AllStations')]",
-				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]",
 				"[concat(variables('factoryId'), '/datasets/GIOS_RestApi')]",
-				"[concat(variables('factoryId'), '/datasets/AllSensors')]"
+				"[concat(variables('factoryId'), '/datasets/AllSensors')]",
+				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
 			]
 		},
 		{
