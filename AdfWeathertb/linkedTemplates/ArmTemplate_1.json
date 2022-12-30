@@ -13,6 +13,279 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/SensorsFromAllStations')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetAvailableSensors",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Clear metadata Station",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "select\n\talst.id\nfrom\n\tdbo.AllStations as alst\n\tleft join dbo.MetaData_Station as mdst\n\ton alst.id = mdst.id\nwhere\n\tmdst.id is null",
+								"queryTimeout": "02:00:00",
+								"isolationLevel": "ReadCommitted",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AllStations",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEveryStationGetSensors",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetAvailableSensors",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetAvailableSensors').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "SetStationId",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "StationId",
+										"value": {
+											"value": "@string(item().id)",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "CreateJsonFileFromRestSensors",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Stored procedure1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET"
+										},
+										"sink": {
+											"type": "JsonSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "JsonWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"parallelCopies": 1,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"path": "$['id']"
+													},
+													"sink": {
+														"path": "$['id']"
+													}
+												},
+												{
+													"source": {
+														"path": "$['stationId']"
+													},
+													"sink": {
+														"path": "$['stationId']"
+													}
+												},
+												{
+													"source": {
+														"path": "$['param']['paramName']"
+													},
+													"sink": {
+														"path": "$['param']['paramName']"
+													}
+												},
+												{
+													"source": {
+														"path": "$['param']['paramFormula']"
+													},
+													"sink": {
+														"path": "$['param']['paramFormula']"
+													}
+												},
+												{
+													"source": {
+														"path": "$['param']['paramCode']"
+													},
+													"sink": {
+														"path": "$['param']['paramCode']"
+													}
+												},
+												{
+													"source": {
+														"path": "$['param']['idParam']"
+													},
+													"sink": {
+														"path": "$['param']['idParam']"
+													}
+												}
+											]
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "GIOS_RestApi",
+											"type": "DatasetReference",
+											"parameters": {
+												"RestApiRelative": {
+													"value": "@Concat('station/sensors/',variables('StationId'))",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "AllSensors",
+											"type": "DatasetReference",
+											"parameters": {
+												"StationId": {
+													"value": "@variables('StationId')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Stored procedure1",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "SetStationId",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[MetadataStationWork]",
+										"storedProcedureParameters": {
+											"ID": {
+												"value": {
+													"value": "@variables('StationId')",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "SqlServer1",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Clear metadata Station",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SqlServer1",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "truncate table dbo.MetaData_Station"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"StationId": {
+						"type": "String",
+						"defaultValue": "14"
+					}
+				},
+				"folder": {
+					"name": "1_FromRestApi"
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-12-04T12:40:29Z"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Sensors')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",

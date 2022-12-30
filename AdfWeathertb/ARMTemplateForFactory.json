@@ -161,8 +161,8 @@
 									}
 								},
 								{
-									"name": "DataLake_LoadStructureOfContainer",
-									"type": "SqlServerStoredProcedure",
+									"name": "Execute Pipeline1",
+									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
 											"activity": "Items in folder",
@@ -171,47 +171,24 @@
 											]
 										}
 									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[[dbo].[DataLake_LoadStructureOfContainer]",
-										"storedProcedureParameters": {
-											"ContainerName": {
-												"value": "stagerawdata",
-												"type": "String"
+										"pipeline": {
+											"referenceName": "Save",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"CollectionOfFiles": {
+												"value": "@activity('Items in folder').output.childItems",
+												"type": "Expression"
 											},
-											"CreatedDate": {
-												"value": {
-													"value": "@utcnow()",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"FileName": {
-												"value": {
-													"value": "@activity('Items in folder').output.childItems.Name",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
+											"ContainerName": "stagerawdata",
 											"FolderName": {
-												"value": {
-													"value": "@variables('FolderName')",
-													"type": "Expression"
-												},
-												"type": "String"
+												"value": "@variables('FolderName')",
+												"type": "Expression"
 											}
 										}
-									},
-									"linkedServiceName": {
-										"referenceName": "SandboxAzure",
-										"type": "LinkedServiceReference"
 									}
 								}
 							]
@@ -235,7 +212,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/Container')]",
 				"[concat(variables('factoryId'), '/datasets/AllFiles')]",
-				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
+				"[concat(variables('factoryId'), '/pipelines/Save')]"
 			]
 		},
 		{
@@ -1380,6 +1357,101 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Save')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "For each file in folder",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.CollectionOfFiles",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "DataLake_LoadStructureOfContainer",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[DataLake_LoadStructureOfContainer]",
+										"storedProcedureParameters": {
+											"ContainerName": {
+												"value": {
+													"value": "@pipeline().parameters.ContainerName",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"CreatedDate": {
+												"value": {
+													"value": "@utcnow()",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"FileName": {
+												"value": {
+													"value": "@item().Name",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"FolderName": {
+												"value": {
+													"value": "@pipeline().parameters.FolderName",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "SandboxAzure",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"CollectionOfFiles": {
+						"type": "array"
+					},
+					"ContainerName": {
+						"type": "string"
+					},
+					"FolderName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "BlobStorage"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
+			]
 		}
 	]
 }
