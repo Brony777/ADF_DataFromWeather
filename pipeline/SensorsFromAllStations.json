@@ -197,6 +197,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
+								"storedProcedureName": "[dbo].[MetadataStationWork]",
 								"storedProcedureParameters": {
 									"ID": {
 										"value": {
