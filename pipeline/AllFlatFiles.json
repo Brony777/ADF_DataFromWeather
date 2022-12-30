@@ -141,7 +141,7 @@
 									},
 									"FileName": {
 										"value": {
-											"value": "@item()",
+											"value": "@item().Name",
 											"type": "Expression"
 										},
 										"type": "String"
