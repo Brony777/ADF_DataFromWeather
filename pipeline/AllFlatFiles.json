@@ -107,60 +107,6 @@
 							}
 						},
 						{
-							"name": "DataLake_LoadStructureOfContainer",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [
-								{
-									"activity": "Items in folder",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[dbo].[DataLake_LoadStructureOfContainer]",
-								"storedProcedureParameters": {
-									"ContainerName": {
-										"value": "stagerawdata",
-										"type": "String"
-									},
-									"CreatedDate": {
-										"value": {
-											"value": "@utcnow()",
-											"type": "Expression"
-										},
-										"type": "DateTime"
-									},
-									"FileName": {
-										"value": {
-											"value": "@activity('Items in folder').output.childItems.Name",
-											"type": "Expression"
-										},
-										"type": "String"
-									},
-									"FolderName": {
-										"value": {
-											"value": "@variables('FolderName')",
-											"type": "Expression"
-										},
-										"type": "String"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "SandboxAzure",
-								"type": "LinkedServiceReference"
-							}
-						},
-						{
 							"name": "Execute Pipeline1",
 							"type": "ExecutePipeline",
 							"dependsOn": [
@@ -173,7 +119,17 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"waitOnCompletion": true
+								"pipeline": {
+									"referenceName": "Save",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"CollectionOfFiles": {
+										"value": "@activity('Items in folder').output.childItems",
+										"type": "Expression"
+									}
+								}
 							}
 						}
 					]
