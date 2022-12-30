@@ -1,0 +1,14 @@
+{
+	"name": "Save",
+	"properties": {
+		"parameters": {
+			"CollectionOfFiles": {
+				"type": "object"
+			}
+		},
+		"folder": {
+			"name": "BlobStorage"
+		},
+		"annotations": []
+	}
+}
