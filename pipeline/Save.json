@@ -29,7 +29,10 @@
 								"storedProcedureName": "[dbo].[DataLake_LoadStructureOfContainer]",
 								"storedProcedureParameters": {
 									"ContainerName": {
-										"value": "stagerawdata",
+										"value": {
+											"value": "@pipeline().parameters.ContainerName",
+											"type": "Expression"
+										},
 										"type": "String"
 									},
 									"CreatedDate": {
@@ -48,7 +51,7 @@
 									},
 									"FolderName": {
 										"value": {
-											"value": "@variables('FolderName')",
+											"value": "@pipeline().parameters.FolderName",
 											"type": "Expression"
 										},
 										"type": "String"
