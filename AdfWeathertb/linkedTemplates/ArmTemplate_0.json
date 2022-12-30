@@ -323,8 +323,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "Stations00:55:02.json",
-						"folderPath": "2022-12-29",
+						"fileName": "Stations13:12:01.json",
+						"folderPath": "2022-12-30",
 						"fileSystem": "stagerawdata"
 					}
 				},
