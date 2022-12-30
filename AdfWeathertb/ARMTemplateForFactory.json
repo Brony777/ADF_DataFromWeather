@@ -103,6 +103,7 @@
 								"value": "@activity('Get List of all folders').output.childItems",
 								"type": "Expression"
 							},
+							"isSequential": true,
 							"activities": [
 								{
 									"name": "Items in folder",
@@ -1374,6 +1375,7 @@
 								"value": "@pipeline().parameters.CollectionOfFiles",
 								"type": "Expression"
 							},
+							"isSequential": true,
 							"activities": [
 								{
 									"name": "DataLake_LoadStructureOfContainer",
