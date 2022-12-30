@@ -67,6 +67,12 @@
 		"parameters": {
 			"CollectionOfFiles": {
 				"type": "array"
+			},
+			"ContainerName": {
+				"type": "string"
+			},
+			"FolderName": {
+				"type": "string"
 			}
 		},
 		"folder": {
