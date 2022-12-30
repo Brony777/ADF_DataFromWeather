@@ -128,6 +128,11 @@
 									"CollectionOfFiles": {
 										"value": "@activity('Items in folder').output.childItems",
 										"type": "Expression"
+									},
+									"ContainerName": "stagerawdata",
+									"FolderName": {
+										"value": "@variables('FolderName')",
+										"type": "Expression"
 									}
 								}
 							}
