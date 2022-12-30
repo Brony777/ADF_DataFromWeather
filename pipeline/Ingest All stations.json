@@ -89,7 +89,7 @@
 				}
 			},
 			{
-				"name": "Save Metadata",
+				"name": "Save Metadata Run ALLFlatFiles",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
