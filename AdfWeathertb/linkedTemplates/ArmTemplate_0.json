@@ -765,7 +765,7 @@
 											},
 											"FileName": {
 												"value": {
-													"value": "@activity('Items in folder').output.itemName",
+													"value": "@activity('Items in folder').output.Name",
 													"type": "Expression"
 												},
 												"type": "String"
