@@ -204,7 +204,6 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[dbo].[MetadataStationWork]",
 								"storedProcedureParameters": {
 									"ID": {
 										"value": {
@@ -216,7 +215,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "SqlServer1",
+								"referenceName": "SandboxAzure",
 								"type": "LinkedServiceReference"
 							}
 						}
