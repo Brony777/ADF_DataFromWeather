@@ -47,6 +47,66 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Load From Raw to table AllStations",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "AllStations ingest",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Load From Raw to table AllStations",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Load Sensors into flat files",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Load From Raw to table AllStations",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SensorsFromAllStations",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Save Metadata",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Load Sensors into flat files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "AllFlatFiles",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"folder": {
