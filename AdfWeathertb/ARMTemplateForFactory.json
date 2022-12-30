@@ -268,6 +268,69 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "Load From Raw to table AllStations",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "AllStations ingest",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load From Raw to table AllStations",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load Sensors into flat files",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load From Raw to table AllStations",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SensorsFromAllStations",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Save Metadata",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Sensors into flat files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "AllFlatFiles",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -282,7 +345,10 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/GIOS_RestApi')]",
-				"[concat(variables('factoryId'), '/datasets/AllStations_JSON')]"
+				"[concat(variables('factoryId'), '/datasets/AllStations_JSON')]",
+				"[concat(variables('factoryId'), '/pipelines/Load From Raw to table AllStations')]",
+				"[concat(variables('factoryId'), '/pipelines/SensorsFromAllStations')]",
+				"[concat(variables('factoryId'), '/pipelines/AllFlatFiles')]"
 			]
 		},
 		{
@@ -458,35 +524,74 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LoadOnlyNewStations')]",
+			"name": "[concat(parameters('factoryName'), '/Save')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Python1",
-						"type": "DatabricksSparkPython",
+						"name": "For each file in folder",
+						"type": "ForEach",
 						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"pythonFile": "/Users/tobe@softwaremind.com/FromRestAPI",
-							"parameters": [],
-							"libraries": [
+							"items": {
+								"value": "@pipeline().parameters.CollectionOfFiles",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
 								{
-									"jar": ""
+									"name": "DataLake_LoadStructureOfContainer",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[DataLake_LoadStructureOfContainer]",
+										"storedProcedureParameters": {
+											"ContainerName": {
+												"value": {
+													"value": "@pipeline().parameters.ContainerName",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"CreatedDate": {
+												"value": {
+													"value": "@utcnow()",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"FileName": {
+												"value": {
+													"value": "@item().Name",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"FolderName": {
+												"value": {
+													"value": "@pipeline().parameters.FolderName",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "SandboxAzure",
+										"type": "LinkedServiceReference"
+									}
 								}
 							]
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureDatabricks1",
-							"type": "LinkedServiceReference"
 						}
 					}
 				],
@@ -494,14 +599,24 @@
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
-				"folder": {
-					"name": "2_FromBlogToStg"
+				"parameters": {
+					"CollectionOfFiles": {
+						"type": "array"
+					},
+					"ContainerName": {
+						"type": "string"
+					},
+					"FolderName": {
+						"type": "string"
+					}
 				},
-				"annotations": [],
-				"lastPublishTime": "2022-11-24T15:22:45Z"
+				"folder": {
+					"name": "BlobStorage"
+				},
+				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
+				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
 			]
 		},
 		{
@@ -532,7 +647,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlServerSource",
-								"sqlReaderQuery": "select\n\talst.id\nfrom\n\tdbo.AllStations as alst\n\tleft join dbo.MetaData_Station as mdst\n\ton alst.id = mdst.id\nwhere\n\tmdst.id is null",
+								"sqlReaderQuery": "select distinct\n\talst.id\nfrom\n\tdbo.AllStations as alst\n\tleft join dbo.MetaData_Station as mdst\n\ton alst.id = mdst.id\nwhere\n\tmdst.id is null",
 								"queryTimeout": "02:00:00",
 								"isolationLevel": "ReadCommitted",
 								"partitionOption": "None"
@@ -1358,102 +1473,6 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Save')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "For each file in folder",
-						"type": "ForEach",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@pipeline().parameters.CollectionOfFiles",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "DataLake_LoadStructureOfContainer",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[DataLake_LoadStructureOfContainer]",
-										"storedProcedureParameters": {
-											"ContainerName": {
-												"value": {
-													"value": "@pipeline().parameters.ContainerName",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"CreatedDate": {
-												"value": {
-													"value": "@utcnow()",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"FileName": {
-												"value": {
-													"value": "@item().Name",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"FolderName": {
-												"value": {
-													"value": "@pipeline().parameters.FolderName",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "SandboxAzure",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"CollectionOfFiles": {
-						"type": "array"
-					},
-					"ContainerName": {
-						"type": "string"
-					},
-					"FolderName": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "BlobStorage"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
-			]
 		}
 	]
 }
