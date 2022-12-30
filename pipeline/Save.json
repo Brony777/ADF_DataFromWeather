@@ -12,6 +12,7 @@
 						"value": "@pipeline().parameters.CollectionOfFiles",
 						"type": "Expression"
 					},
+					"isSequential": true,
 					"activities": [
 						{
 							"name": "DataLake_LoadStructureOfContainer",

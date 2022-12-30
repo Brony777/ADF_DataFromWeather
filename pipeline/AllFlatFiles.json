@@ -49,6 +49,7 @@
 						"value": "@activity('Get List of all folders').output.childItems",
 						"type": "Expression"
 					},
+					"isSequential": true,
 					"activities": [
 						{
 							"name": "Items in folder",
