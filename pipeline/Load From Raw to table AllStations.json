@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('List files stations').output",
+						"value": "@activity('List files stations').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
