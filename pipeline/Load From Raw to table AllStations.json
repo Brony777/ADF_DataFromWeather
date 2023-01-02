@@ -237,6 +237,42 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "Update as loaded file",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "AllStations",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "SandboxAzure",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "update\ntarget\nset\n\tDataLoaded = 1\nfrom\n\tdbo.DataLake_FilesMetadata as target\nwhere\n\tContainerName = variables('ContainerName')\n\tand FolderName = variables('FolderName')\n\tand FileName = variables('FileName')",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
 						}
 					]
 				}
