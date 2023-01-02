@@ -3,8 +3,170 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "AllStations",
-				"type": "Copy",
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "List files stations",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"activities": [
+						{
+							"name": "AllStations",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"sink": {
+									"type": "SqlServerSink",
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": [
+											"id"
+										]
+									},
+									"sqlWriterUseTableLock": true
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "$['id']"
+											},
+											"sink": {
+												"name": "id",
+												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"path": "$['stationName']"
+											},
+											"sink": {
+												"name": "stationName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['gegrLat']"
+											},
+											"sink": {
+												"name": "gegrLat",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['gegrLon']"
+											},
+											"sink": {
+												"name": "gegrLon",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['city']['id']"
+											},
+											"sink": {
+												"name": "Cityid",
+												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"path": "$['city']['name']"
+											},
+											"sink": {
+												"name": "Cityname",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['city']['commune']['communeName']"
+											},
+											"sink": {
+												"name": "communeName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['city']['commune']['districtName']"
+											},
+											"sink": {
+												"name": "districtName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['city']['commune']['provinceName']"
+											},
+											"sink": {
+												"name": "provinceName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['addressStreet']"
+											},
+											"sink": {
+												"name": "addressStreet",
+												"type": "String"
+											}
+										}
+									]
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "AllStationFiles",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "AllStations",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "List files stations",
+				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -16,136 +178,16 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "JsonSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "JsonReadSettings"
-						}
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "select\n\tContainerName\n\t,FolderName\n\t,FileName\nfrom\n\tdbo.DataLake_FilesMetadata\nwhere\n\tFileName like '%Stations%.json%'\n\tand ISNULL(DataLoaded,0) = 0\norder by\n\tid asc",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
-					"sink": {
-						"type": "SqlServerSink",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"id"
-							]
-						},
-						"sqlWriterUseTableLock": true
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['id']"
-								},
-								"sink": {
-									"name": "id",
-									"type": "Int32"
-								}
-							},
-							{
-								"source": {
-									"path": "$['stationName']"
-								},
-								"sink": {
-									"name": "stationName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['gegrLat']"
-								},
-								"sink": {
-									"name": "gegrLat",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['gegrLon']"
-								},
-								"sink": {
-									"name": "gegrLon",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['city']['id']"
-								},
-								"sink": {
-									"name": "Cityid",
-									"type": "Int32"
-								}
-							},
-							{
-								"source": {
-									"path": "$['city']['name']"
-								},
-								"sink": {
-									"name": "Cityname",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['city']['commune']['communeName']"
-								},
-								"sink": {
-									"name": "communeName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['city']['commune']['districtName']"
-								},
-								"sink": {
-									"name": "districtName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['city']['commune']['provinceName']"
-								},
-								"sink": {
-									"name": "provinceName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['addressStreet']"
-								},
-								"sink": {
-									"name": "addressStreet",
-									"type": "String"
-								}
-							}
-						]
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "AllStationFiles",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
+					"dataset": {
 						"referenceName": "AllStations",
 						"type": "DatasetReference"
 					}
-				]
+				}
 			}
 		],
 		"variables": {
