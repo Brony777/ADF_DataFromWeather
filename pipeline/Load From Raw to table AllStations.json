@@ -207,7 +207,7 @@
 							"typeProperties": {
 								"variableName": "ContainerName",
 								"value": {
-									"value": "@item().ContainerName",
+									"value": "@string(item().ContainerName)",
 									"type": "Expression"
 								}
 							}
@@ -220,7 +220,7 @@
 							"typeProperties": {
 								"variableName": "FolderName",
 								"value": {
-									"value": "@item().FolderName",
+									"value": "@string(item().FolderName)",
 									"type": "Expression"
 								}
 							}
@@ -233,7 +233,7 @@
 							"typeProperties": {
 								"variableName": "FileName",
 								"value": {
-									"value": "@item().FileName",
+									"value": "@string(item().FileName)",
 									"type": "Expression"
 								}
 							}
