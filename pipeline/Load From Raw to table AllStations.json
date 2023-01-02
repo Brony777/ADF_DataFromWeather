@@ -24,7 +24,26 @@
 						{
 							"name": "AllStations",
 							"type": "Copy",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Set variable cointainerName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Set variable fileName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Set variable FolderName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -156,7 +175,21 @@
 							"inputs": [
 								{
 									"referenceName": "AllStationFiles",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"Container": {
+											"value": "@variables('ContainerName')",
+											"type": "Expression"
+										},
+										"FolderName": {
+											"value": "@variables('FolderName')",
+											"type": "Expression"
+										},
+										"FileName": {
+											"value": "@variables('FileName')",
+											"type": "Expression"
+										}
+									}
 								}
 							],
 							"outputs": [
@@ -165,6 +198,45 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "Set variable cointainerName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "ContainerName",
+								"value": {
+									"value": "@item().ContainerName",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable FolderName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "FolderName",
+								"value": {
+									"value": "@item().FolderName",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable fileName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "FileName",
+								"value": {
+									"value": "@item().FileName",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -199,7 +271,13 @@
 			"ListOfFiles": {
 				"type": "Array"
 			},
-			"FilePath": {
+			"FileName": {
+				"type": "String"
+			},
+			"FolderName": {
+				"type": "String"
+			},
+			"ContainerName": {
 				"type": "String"
 			}
 		},
