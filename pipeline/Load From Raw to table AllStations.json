@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "ForEach1",
+				"name": "For each file load new stations",
 				"type": "ForEach",
 				"dependsOn": [
 					{
