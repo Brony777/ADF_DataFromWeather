@@ -622,7 +622,7 @@
 											{
 												"type": "Query",
 												"text": {
-													"value": "update\ntarget\nset\n\tDataLoaded = 1\nfrom\n\tdbo.DataLake_FilesMetadata as target\nwhere\n\tContainerName = variables('ContainerName')\n\tand FolderName = variables('FolderName')\n\tand FileName = variables('FileName')",
+													"value": "update\ntarget\nset\n\tDataLoaded = 1\nfrom\n\tdbo.DataLake_FilesMetadata as target\nwhere\n\tContainerName = '@{variables('ContainerName')}'\n\tand FolderName = '@{variables('FolderName')}'\n\tand FileName = '@{variables('FileName')}'",
 													"type": "Expression"
 												}
 											}
