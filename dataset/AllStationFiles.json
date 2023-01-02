@@ -5,6 +5,18 @@
 			"referenceName": "stagerawdata",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"Container": {
+				"type": "string",
+				"defaultValue": "stagerawdata"
+			},
+			"FolderName": {
+				"type": "string"
+			},
+			"FileName": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "ADLS_FlatFiles"
 		},
@@ -13,9 +25,18 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Stations13:12:01.json",
-				"folderPath": "2022-12-30",
-				"fileSystem": "stagerawdata"
+				"fileName": {
+					"value": "@dataset().FileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().FolderName",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().Container",
+					"type": "Expression"
+				}
 			}
 		},
 		"schema": {
