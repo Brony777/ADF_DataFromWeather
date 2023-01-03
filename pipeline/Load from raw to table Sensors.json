@@ -1,0 +1,37 @@
+{
+	"name": "Load from raw to table Sensors",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "select\n\tContainerName\n\t,FolderName\n\t,FileName\nfrom\n\tdbo.DataLake_FilesMetadata\nwhere\n\tFileName like 'Station[_]%'\n\tand ISNULL(DataLoaded,0) = 0\norder by\n\tid asc",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AllFlatFiles",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"folder": {
+			"name": "2_FromBlogToStg"
+		},
+		"annotations": []
+	}
+}
