@@ -29,6 +29,17 @@
 				}
 			}
 		],
+		"variables": {
+			"ContainerName": {
+				"type": "String"
+			},
+			"FolderName": {
+				"type": "String"
+			},
+			"FileName": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "2_FromBlogToStg"
 		},
