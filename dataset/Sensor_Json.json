@@ -1,9 +1,20 @@
 {
-	"name": "Container",
+	"name": "Sensor_Json",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "stagerawdata",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"ContainerName": {
+				"type": "string"
+			},
+			"FolderName": {
+				"type": "string"
+			},
+			"FileName": {
+				"type": "string"
+			}
 		},
 		"folder": {
 			"name": "ADLS_FlatFiles"
@@ -13,7 +24,18 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileSystem": "stagerawdata"
+				"fileName": {
+					"value": "@dataset().FileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().FolderName",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().ContainerName",
+					"type": "Expression"
+				}
 			}
 		},
 		"schema": {
@@ -22,42 +44,25 @@
 				"id": {
 					"type": "integer"
 				},
-				"stationName": {
-					"type": "string"
+				"stationId": {
+					"type": "integer"
 				},
-				"gegrLat": {
-					"type": "string"
-				},
-				"gegrLon": {
-					"type": "string"
-				},
-				"city": {
+				"param": {
 					"type": "object",
 					"properties": {
-						"id": {
-							"type": "integer"
-						},
-						"name": {
+						"paramName": {
 							"type": "string"
 						},
-						"commune": {
-							"type": "object",
-							"properties": {
-								"communeName": {
-									"type": "string"
-								},
-								"districtName": {
-									"type": "string"
-								},
-								"provinceName": {
-									"type": "string"
-								}
-							}
+						"paramFormula": {
+							"type": "string"
+						},
+						"paramCode": {
+							"type": "string"
+						},
+						"idParam": {
+							"type": "integer"
 						}
 					}
-				},
-				"addressStreet": {
-					"type": "string"
 				}
 			}
 		}
