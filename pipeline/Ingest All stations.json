@@ -113,7 +113,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Load Sensors into flat files",
+						"activity": "Save Metadata Run ALLFlatFiles",
 						"dependencyConditions": [
 							"Succeeded"
 						]
