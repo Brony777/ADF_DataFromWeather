@@ -130,7 +130,7 @@
 			}
 		],
 		"folder": {
-			"name": "1_FromRestApi"
+			"name": "ETL"
 		},
 		"annotations": [],
 		"lastPublishTime": "2022-09-16T10:46:49Z"
