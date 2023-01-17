@@ -69,7 +69,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataset": {
-								"referenceName": "Container",
+								"referenceName": "AllItemsFromDataLake",
 								"type": "DatasetReference",
 								"parameters": {}
 							},
@@ -211,7 +211,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Container')]",
+				"[concat(variables('factoryId'), '/datasets/AllItemsFromDataLake')]",
 				"[concat(variables('factoryId'), '/datasets/AllFiles')]",
 				"[concat(variables('factoryId'), '/pipelines/Save')]"
 			]
@@ -688,6 +688,307 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/AllStations')]",
 				"[concat(variables('factoryId'), '/datasets/AllStationFiles')]",
+				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Load from raw to table Sensors')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup for all sensors files",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "select\n\tContainerName\n\t,FolderName\n\t,FileName\nfrom\n\tdbo.DataLake_FilesMetadata\nwhere\n\tFileName like 'Station[_]%'\n\tand ISNULL(DataLoaded,0) = 0\norder by\n\tid asc",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AllFlatFiles",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "For each sensor file",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup for all sensors files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup for all sensors files').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Copy data from Sensor file to table",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Set ContainerName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Set FolderName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Set FileName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "JsonSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "JsonReadSettings"
+											}
+										},
+										"sink": {
+											"type": "SqlServerSink",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"id"
+												]
+											},
+											"sqlWriterUseTableLock": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"path": "$['id']"
+													},
+													"sink": {
+														"name": "SensorId",
+														"type": "Int32"
+													}
+												},
+												{
+													"source": {
+														"path": "$['stationId']"
+													},
+													"sink": {
+														"name": "StationId",
+														"type": "Int32"
+													}
+												},
+												{
+													"source": {
+														"path": "$['param']['paramName']"
+													},
+													"sink": {
+														"name": "paramName",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['param']['paramFormula']"
+													},
+													"sink": {
+														"name": "paramFormula",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['param']['paramCode']"
+													},
+													"sink": {
+														"name": "paramCode",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['param']['idParam']"
+													},
+													"sink": {
+														"name": "idParam",
+														"type": "Int32"
+													}
+												}
+											]
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "Sensor_Json",
+											"type": "DatasetReference",
+											"parameters": {
+												"ContainerName": {
+													"value": "@variables('ContainerName')",
+													"type": "Expression"
+												},
+												"FolderName": {
+													"value": "@variables('FolderName')",
+													"type": "Expression"
+												},
+												"FileName": {
+													"value": "@variables('FileName')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Sensors",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								},
+								{
+									"name": "Set ContainerName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "ContainerName",
+										"value": {
+											"value": "@string(item().ContainerName)",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set FolderName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "FolderName",
+										"value": {
+											"value": "@string(item().FolderName)",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set FileName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "FileName",
+										"value": {
+											"value": "@string(item().FileName)",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Update FileLoad status",
+									"type": "Script",
+									"dependsOn": [
+										{
+											"activity": "Copy data from Sensor file to table",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"linkedServiceName": {
+										"referenceName": "SandboxAzure",
+										"type": "LinkedServiceReference"
+									},
+									"typeProperties": {
+										"scripts": [
+											{
+												"type": "Query",
+												"text": "update\ntarget\nset\n\tDataLoaded = 1\nfrom\n\tdbo.DataLake_FilesMetadata as target\nwhere\n\tContainerName = '@{variables('ContainerName')}'\n\tand FolderName = '@{variables('FolderName')}'\n\tand FileName = '@{variables('FileName')}'"
+											}
+										],
+										"scriptBlockExecutionTimeout": "02:00:00"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"ContainerName": {
+						"type": "String"
+					},
+					"FolderName": {
+						"type": "String"
+					},
+					"FileName": {
+						"type": "String"
+					},
+					"ListOfFiles": {
+						"type": "Array"
+					}
+				},
+				"folder": {
+					"name": "2_FromBlogToStg"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/AllFlatFiles')]",
+				"[concat(variables('factoryId'), '/datasets/Sensor_Json')]",
+				"[concat(variables('factoryId'), '/datasets/Sensors')]",
 				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
 			]
 		},
@@ -1274,7 +1575,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "LocalDB"
+					"name": "AzureDBSandbox"
 				},
 				"annotations": [],
 				"type": "SqlServerTable",
@@ -1411,13 +1712,24 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Container')]",
+			"name": "[concat(parameters('factoryName'), '/Sensor_Json')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "stagerawdata",
 					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ContainerName": {
+						"type": "string"
+					},
+					"FolderName": {
+						"type": "string"
+					},
+					"FileName": {
+						"type": "string"
+					}
 				},
 				"folder": {
 					"name": "ADLS_FlatFiles"
@@ -1427,7 +1739,18 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileSystem": "stagerawdata"
+						"fileName": {
+							"value": "@dataset().FileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().FolderName",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().ContainerName",
+							"type": "Expression"
+						}
 					}
 				},
 				"schema": {
@@ -1436,42 +1759,25 @@
 						"id": {
 							"type": "integer"
 						},
-						"stationName": {
-							"type": "string"
+						"stationId": {
+							"type": "integer"
 						},
-						"gegrLat": {
-							"type": "string"
-						},
-						"gegrLon": {
-							"type": "string"
-						},
-						"city": {
+						"param": {
 							"type": "object",
 							"properties": {
-								"id": {
-									"type": "integer"
-								},
-								"name": {
+								"paramName": {
 									"type": "string"
 								},
-								"commune": {
-									"type": "object",
-									"properties": {
-										"communeName": {
-											"type": "string"
-										},
-										"districtName": {
-											"type": "string"
-										},
-										"provinceName": {
-											"type": "string"
-										}
-									}
+								"paramFormula": {
+									"type": "string"
+								},
+								"paramCode": {
+									"type": "string"
+								},
+								"idParam": {
+									"type": "integer"
 								}
 							}
-						},
-						"addressStreet": {
-							"type": "string"
 						}
 					}
 				}
@@ -1518,22 +1824,22 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SqlServer1",
+					"referenceName": "SandboxAzure",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "LocalDB"
+					"name": "AzureDBSandbox"
 				},
 				"annotations": [],
 				"type": "SqlServerTable",
 				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "Sensors"
+					"table": "AllSensors"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]"
+				"[concat(variables('factoryId'), '/linkedServices/SandboxAzure')]"
 			]
 		},
 		{
@@ -1693,6 +1999,73 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AllItemsFromDataLake')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "stagerawdata",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "stagerawdata"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "integer"
+						},
+						"stationName": {
+							"type": "string"
+						},
+						"gegrLat": {
+							"type": "string"
+						},
+						"gegrLon": {
+							"type": "string"
+						},
+						"city": {
+							"type": "object",
+							"properties": {
+								"id": {
+									"type": "integer"
+								},
+								"name": {
+									"type": "string"
+								},
+								"commune": {
+									"type": "object",
+									"properties": {
+										"communeName": {
+											"type": "string"
+										},
+										"districtName": {
+											"type": "string"
+										},
+										"provinceName": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						},
+						"addressStreet": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/stagerawdata')]"
+			]
 		}
 	]
 }
