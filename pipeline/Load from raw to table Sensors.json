@@ -27,6 +27,209 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "For each sensor file",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup for all sensors files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup for all sensors files').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data from Sensor file to table",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Set ContainerName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Set FolderName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Set FileName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"sink": {
+									"type": "SqlServerSink",
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": [
+											"id"
+										]
+									},
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "$['id']"
+											},
+											"sink": {
+												"name": "SensorId",
+												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"path": "$['stationId']"
+											},
+											"sink": {
+												"name": "StationId",
+												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"path": "$['param']['paramName']"
+											},
+											"sink": {
+												"name": "paramName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['param']['paramFormula']"
+											},
+											"sink": {
+												"name": "paramFormula",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['param']['paramCode']"
+											},
+											"sink": {
+												"name": "paramCode",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['param']['idParam']"
+											},
+											"sink": {
+												"name": "idParam",
+												"type": "Int32"
+											}
+										}
+									]
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "Sensor_Json",
+									"type": "DatasetReference",
+									"parameters": {
+										"ContainerName": {
+											"value": "@variables('ContainerName')",
+											"type": "Expression"
+										},
+										"FolderName": {
+											"value": "@variables('FolderName')",
+											"type": "Expression"
+										},
+										"FileName": {
+											"value": "@variables('FileName')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Sensors",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "Set ContainerName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "ContainerName",
+								"value": {
+									"value": "@string(item().ContainerName)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set FolderName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "FolderName",
+								"value": {
+									"value": "@string(item().FolderName)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set FileName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "FileName",
+								"value": {
+									"value": "@string(item().FileName)",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
 			}
 		],
 		"variables": {
@@ -38,6 +241,9 @@
 			},
 			"FileName": {
 				"type": "String"
+			},
+			"ListOfFiles": {
+				"type": "Array"
 			}
 		},
 		"folder": {
