@@ -227,6 +227,39 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "Update FileLoad status",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Copy data from Sensor file to table",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "SandboxAzure",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": "update\ntarget\nset\n\tDataLoaded = 1\nfrom\n\tdbo.DataLake_FilesMetadata as target\nwhere\n\tContainerName = '@{variables('ContainerName')}'\n\tand FolderName = '@{variables('FolderName')}'\n\tand FileName = '@{variables('FileName')}'"
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
 						}
 					]
 				}
