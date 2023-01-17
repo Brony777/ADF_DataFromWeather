@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "Sensor_Json",
+						"referenceName": "AllItemsFromDataLake",
 						"type": "DatasetReference"
 					},
 					"fieldList": [

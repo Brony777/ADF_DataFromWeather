@@ -1,0 +1,62 @@
+{
+	"name": "AllItemsFromDataLake",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "stagerawdata",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "stagerawdata"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"stationName": {
+					"type": "string"
+				},
+				"gegrLat": {
+					"type": "string"
+				},
+				"gegrLon": {
+					"type": "string"
+				},
+				"city": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "integer"
+						},
+						"name": {
+							"type": "string"
+						},
+						"commune": {
+							"type": "object",
+							"properties": {
+								"communeName": {
+									"type": "string"
+								},
+								"districtName": {
+									"type": "string"
+								},
+								"provinceName": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"addressStreet": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}
