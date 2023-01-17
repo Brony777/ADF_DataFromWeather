@@ -331,6 +331,27 @@
 							"waitOnCompletion": true,
 							"parameters": {}
 						}
+					},
+					{
+						"name": "Load data from sensors from blob",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Sensors into flat files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load from raw to table Sensors",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -348,7 +369,8 @@
 				"[concat(variables('factoryId'), '/datasets/AllStations_JSON')]",
 				"[concat(variables('factoryId'), '/pipelines/Load From Raw to table AllStations')]",
 				"[concat(variables('factoryId'), '/pipelines/SensorsFromAllStations')]",
-				"[concat(variables('factoryId'), '/pipelines/AllFlatFiles')]"
+				"[concat(variables('factoryId'), '/pipelines/AllFlatFiles')]",
+				"[concat(variables('factoryId'), '/pipelines/Load from raw to table Sensors')]"
 			]
 		},
 		{
