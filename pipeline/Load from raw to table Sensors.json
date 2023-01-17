@@ -96,7 +96,7 @@
 									"upsertSettings": {
 										"useTempDB": true,
 										"keys": [
-											"id"
+											"SensorId"
 										]
 									},
 									"sqlWriterUseTableLock": false
